@@ -516,7 +516,7 @@ const SETTINGS_SCHEMA = {
         label: 'Use Alternate Screen Buffer',
         category: 'UI',
         requiresRestart: true,
-        default: true,
+        default: false,
         description:
           'Use an alternate screen buffer for the UI, preserving shell history.',
         showInDialog: true,
@@ -729,6 +729,16 @@ const SETTINGS_SCHEMA = {
           'Named presets for model configs. Can be used in place of a model name and can inherit from other aliases using an `extends` property.',
         showInDialog: false,
       },
+      customAliases: {
+        type: 'object',
+        label: 'Custom Model Config Aliases',
+        category: 'Model',
+        requiresRestart: false,
+        default: {},
+        description:
+          'Custom named presets for model configs. These are merged with (and override) the built-in aliases.',
+        showInDialog: false,
+      },
       overrides: {
         type: 'array',
         label: 'Model Config Overrides',
@@ -919,6 +929,16 @@ const SETTINGS_SCHEMA = {
             default: false,
             description: 'Show color in shell output.',
             showInDialog: true,
+          },
+          inactivityTimeout: {
+            type: 'number',
+            label: 'Inactivity Timeout',
+            category: 'Tools',
+            requiresRestart: false,
+            default: 300,
+            description:
+              'The maximum time in seconds allowed without output from the shell command. Defaults to 5 minutes.',
+            showInDialog: false,
           },
         },
       },
@@ -1281,6 +1301,15 @@ const SETTINGS_SCHEMA = {
           'Enables extension loading/unloading within the CLI session.',
         showInDialog: false,
       },
+      isModelAvailabilityServiceEnabled: {
+        type: 'boolean',
+        label: 'Enable Model Availability Service',
+        category: 'Experimental',
+        requiresRestart: true,
+        default: false,
+        description: 'Enable model routing using new availability service.',
+        showInDialog: false,
+      },
       codebaseInvestigatorSettings: {
         type: 'object',
         label: 'Codebase Investigator Settings',
@@ -1496,6 +1525,11 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
         type: 'string',
         description:
           'Service account email to impersonate (name@project.iam.gserviceaccount.com).',
+      },
+      useInstructions: {
+        type: 'boolean',
+        description:
+          'If true, instructions from this server will be included in the system prompt.',
       },
     },
   },
