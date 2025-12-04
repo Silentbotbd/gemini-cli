@@ -16,6 +16,7 @@ import type {
   ClientMetadata,
   RetrieveUserQuotaRequest,
   RetrieveUserQuotaResponse,
+  ReceiveEventRequest,
 } from './types.js';
 import type {
   ListExperimentsRequest,
@@ -176,6 +177,11 @@ export class CodeAssistServer implements ContentGenerator {
     );
   }
 
+  async receiveEvents(req: ReceiveEventRequest): Promise<void> {
+    const res = await this.requestPost('event:receive', req);
+    console.log(res);
+  }
+
   async requestPost<T>(
     method: string,
     req: object,
@@ -254,7 +260,10 @@ export class CodeAssistServer implements ContentGenerator {
   getMethodUrl(method: string): string {
     const endpoint =
       process.env['CODE_ASSIST_ENDPOINT'] ?? CODE_ASSIST_ENDPOINT;
-    return `${endpoint}/${CODE_ASSIST_API_VERSION}:${method}`;
+
+    return method === 'event:receive'
+      ? `${endpoint}/${CODE_ASSIST_API_VERSION}/${method}`
+      : `${endpoint}/${CODE_ASSIST_API_VERSION}:${method}`;
   }
 }
 

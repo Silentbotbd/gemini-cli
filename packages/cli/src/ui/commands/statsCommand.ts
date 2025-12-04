@@ -40,6 +40,10 @@ async function defaultSessionView(context: CommandContext) {
       const quota = await server.retrieveUserQuota({
         project: server.projectId,
       });
+      const res = await server.receiveEvents({
+        project: server.projectId,
+      });
+      console.log(res);
       statsItem.quotas = quota;
     }
   }
