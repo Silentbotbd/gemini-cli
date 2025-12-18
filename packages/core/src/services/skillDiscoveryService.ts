@@ -15,6 +15,10 @@ export interface SkillMetadata {
   location: string; // Absolute path to SKILL.md
 }
 
+export interface SkillContent extends SkillMetadata {
+  body: string; // The Markdown content after the frontmatter
+}
+
 export class SkillDiscoveryService {
   /**
    * Discovers skills in the provided paths.
@@ -60,6 +64,41 @@ export class SkillDiscoveryService {
     }
 
     return skills;
+  }
+
+  /**
+   * Reads the full content (metadata + body) of a skill file.
+   */
+  async getSkillContent(filePath: string): Promise<SkillContent | null> {
+    try {
+      const content = await fs.readFile(filePath, 'utf-8');
+
+      // Extract YAML frontmatter
+      const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)/);
+      if (!match) {
+        return null;
+      }
+
+      const frontmatter = yaml.load(match[1]);
+      if (!frontmatter || typeof frontmatter !== 'object') {
+        return null;
+      }
+
+      const { name, description } = frontmatter as Record<string, unknown>;
+      if (typeof name !== 'string' || typeof description !== 'string') {
+        return null;
+      }
+
+      return {
+        name,
+        description,
+        location: filePath,
+        body: match[2].trim(),
+      };
+    } catch (error) {
+      console.error(`Error reading skill content from ${filePath}:`, error);
+      return null;
+    }
   }
 
   private async parseSkillFile(

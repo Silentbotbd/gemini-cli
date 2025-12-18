@@ -180,7 +180,10 @@ export class GeminiClient {
     }
 
     const userMemory = this.config.getUserMemory();
-    const systemInstruction = getCoreSystemPrompt(this.config, userMemory);
+    const systemInstruction = await getCoreSystemPrompt(
+      this.config,
+      userMemory,
+    );
     this.getChat().setSystemInstruction(systemInstruction);
   }
 
@@ -199,7 +202,10 @@ export class GeminiClient {
 
     try {
       const userMemory = this.config.getUserMemory();
-      const systemInstruction = getCoreSystemPrompt(this.config, userMemory);
+      const systemInstruction = await getCoreSystemPrompt(
+        this.config,
+        userMemory,
+      );
       return new GeminiChat(
         this.config,
         systemInstruction,
@@ -670,7 +676,10 @@ export class GeminiClient {
 
     try {
       const userMemory = this.config.getUserMemory();
-      const systemInstruction = getCoreSystemPrompt(this.config, userMemory);
+      const systemInstruction = await getCoreSystemPrompt(
+        this.config,
+        userMemory,
+      );
       const {
         model,
         config: newConfig,

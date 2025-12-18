@@ -23,6 +23,7 @@ import { ToolRegistry } from '../tools/tool-registry.js';
 import { LSTool } from '../tools/ls.js';
 import { ReadFileTool } from '../tools/read-file.js';
 import { GrepTool } from '../tools/grep.js';
+import { ActivateSkillTool } from '../tools/activate-skill.js';
 import { canUseRipgrep, RipGrepTool } from '../tools/ripGrep.js';
 import { GlobTool } from '../tools/glob.js';
 import { EditTool } from '../tools/edit.js';
@@ -383,6 +384,7 @@ export class Config {
   private fileDiscoveryService: FileDiscoveryService | null = null;
   private skillDiscoveryService: SkillDiscoveryService | null = null;
   private skills: SkillMetadata[] = [];
+  private activeSkillNames: Set<string> = new Set();
   private gitService: GitService | undefined = undefined;
   private readonly checkpointing: boolean;
   private readonly proxy: string | undefined;
@@ -1257,6 +1259,22 @@ export class Config {
     return this.skills;
   }
 
+  async getSkillContent(name: string): Promise<SkillMetadata | null> {
+    const skill = this.skills.find((s) => s.name === name);
+    if (!skill || !this.skillDiscoveryService) {
+      return null;
+    }
+    return this.skillDiscoveryService.getSkillContent(skill.location);
+  }
+
+  getActiveSkillNames(): string[] {
+    return Array.from(this.activeSkillNames);
+  }
+
+  activateSkill(name: string): void {
+    this.activeSkillNames.add(name);
+  }
+
   getBugCommand(): BugCommandSettings | undefined {
     return this.bugCommand;
   }
@@ -1627,6 +1645,7 @@ export class Config {
     registerCoreTool(WebFetchTool, this);
     registerCoreTool(ShellTool, this);
     registerCoreTool(MemoryTool);
+    registerCoreTool(ActivateSkillTool, this);
     registerCoreTool(WebSearchTool, this);
     if (this.getUseWriteTodos()) {
       registerCoreTool(WriteTodosTool, this);
