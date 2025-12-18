@@ -72,7 +72,30 @@ describe('Core System Prompt (prompts.ts)', () => {
       getAgentRegistry: vi.fn().mockReturnValue({
         getDirectoryContext: vi.fn().mockReturnValue('Mock Agent Directory'),
       }),
+      getSkills: vi.fn().mockReturnValue([]),
     } as unknown as Config;
+  });
+
+  it('should include available_skills when provided in config', () => {
+    const skills = [
+      {
+        name: 'test-skill',
+        description: 'A test skill description',
+        location: '/path/to/test-skill/SKILL.md',
+      },
+    ];
+    vi.mocked(mockConfig.getSkills).mockReturnValue(skills);
+    const prompt = getCoreSystemPrompt(mockConfig);
+
+    expect(prompt).toContain('<available_skills>');
+    expect(prompt).toContain('<name>test-skill</name>');
+    expect(prompt).toContain(
+      '<description>A test skill description</description>',
+    );
+    expect(prompt).toContain(
+      '<location>/path/to/test-skill/SKILL.md</location>',
+    );
+    expect(prompt).toContain('</available_skills>');
   });
 
   it('should use chatty system prompt for preview model', () => {
@@ -175,6 +198,7 @@ describe('Core System Prompt (prompts.ts)', () => {
         getAgentRegistry: vi.fn().mockReturnValue({
           getDirectoryContext: vi.fn().mockReturnValue('Mock Agent Directory'),
         }),
+        getSkills: vi.fn().mockReturnValue([]),
       } as unknown as Config;
 
       const prompt = getCoreSystemPrompt(testConfig);

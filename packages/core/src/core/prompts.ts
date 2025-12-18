@@ -382,7 +382,21 @@ Your core function is efficient and safe assistance. Balance extreme conciseness
       ? `\n\n---\n\n${userMemory.trim()}`
       : '';
 
-  return `${basePrompt}${memorySuffix}`;
+  const skills = config.getSkills();
+  let skillsPrompt = '';
+  if (skills.length > 0) {
+    skillsPrompt = `\n\n<available_skills>\n${skills
+      .map(
+        (skill) => `  <skill>
+    <name>${skill.name}</name>
+    <description>${skill.description}</description>
+    <location>${skill.location}</location>
+  </skill>`,
+      )
+      .join('\n')}\n</available_skills>`;
+  }
+
+  return `${basePrompt}${skillsPrompt}${memorySuffix}`;
 }
 
 /**
