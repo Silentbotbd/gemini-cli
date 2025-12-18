@@ -87,6 +87,10 @@ describe('Core System Prompt (prompts.ts)', () => {
     vi.mocked(mockConfig.getSkills).mockReturnValue(skills);
     const prompt = getCoreSystemPrompt(mockConfig);
 
+    expect(prompt).toContain('# Available Agent Skills');
+    expect(prompt).toContain(
+      'You have explicit permission to read these files',
+    );
     expect(prompt).toContain('<available_skills>');
     expect(prompt).toContain('<name>test-skill</name>');
     expect(prompt).toContain(

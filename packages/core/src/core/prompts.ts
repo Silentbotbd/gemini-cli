@@ -130,6 +130,28 @@ export function getCoreSystemPrompt(
 
   const interactiveMode = config.isInteractiveShellEnabled();
 
+  const skills = config.getSkills();
+  let skillsPrompt = '';
+  if (skills.length > 0) {
+    skillsPrompt = `
+# Available Agent Skills
+
+You have access to the following specialized skills. To activate a skill and follow its detailed instructions, you MUST first read its \`SKILL.md\` file using the \`${READ_FILE_TOOL_NAME}\` tool. You have explicit permission to read these files even if they are outside your normal workspace.
+
+<available_skills>
+${skills
+  .map(
+    (skill) => `  <skill>
+    <name>${skill.name}</name>
+    <description>${skill.description}</description>
+    <location>${skill.location}</location>
+  </skill>`,
+  )
+  .join('\n')}
+</available_skills>
+`;
+  }
+
   let basePrompt: string;
   if (systemMdEnabled) {
     basePrompt = fs.readFileSync(systemMdPath, 'utf8');
@@ -154,7 +176,7 @@ export function getCoreSystemPrompt(
           : ''
       }
 
-${config.getAgentRegistry().getDirectoryContext()}`,
+${config.getAgentRegistry().getDirectoryContext()}${skillsPrompt}`,
       primaryWorkflows_prefix: `
 # Primary Workflows
 
@@ -382,21 +404,7 @@ Your core function is efficient and safe assistance. Balance extreme conciseness
       ? `\n\n---\n\n${userMemory.trim()}`
       : '';
 
-  const skills = config.getSkills();
-  let skillsPrompt = '';
-  if (skills.length > 0) {
-    skillsPrompt = `\n\n<available_skills>\n${skills
-      .map(
-        (skill) => `  <skill>
-    <name>${skill.name}</name>
-    <description>${skill.description}</description>
-    <location>${skill.location}</location>
-  </skill>`,
-      )
-      .join('\n')}\n</available_skills>`;
-  }
-
-  return `${basePrompt}${skillsPrompt}${memorySuffix}`;
+  return `${basePrompt}${memorySuffix}`;
 }
 
 /**
