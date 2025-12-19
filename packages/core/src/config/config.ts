@@ -1112,6 +1112,7 @@ export class Config {
       );
     }
     this.approvalMode = mode;
+    this.policyEngine.setApprovalMode(mode);
   }
 
   isYoloModeDisabled(): boolean {
